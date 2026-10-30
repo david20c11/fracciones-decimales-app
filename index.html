@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fracciones y Decimales App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+
+        /* Animaciones aleatorias para los botones de retos */
+        @keyframes customPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.06);
+            }
+        }
+
+        @keyframes customBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .anim-pulse {
+            animation: customPulse 3s infinite ease-in-out;
+        }
+
+        .anim-bounce {
+            animation: customBounce 2.5s infinite ease-in-out;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-slate-100 min-h-full flex flex-col justify-between selection:bg-indigo-500 selection:text-white font-light">
+
+    <!-- CONTENEDOR PRINCIPAL DE LA APLICACIÓN -->
+    <div id="app" class="flex-grow flex flex-col justify-between max-w-lg mx-auto w-full p-4 sm:p-6">
+        <!-- Se renderiza dinámicamente mediante JavaScript -->
+    </div>
+
+    <!-- SCRIPT PRINCIPAL -->
+    <script>
+        // Banco de los 15 Retos Educativos de Fracciones y Decimales
+        const challengesData = [
+            {
+                id: 1,
+                title: "1. Fracción a Decimal",
+                category: "Fracciones y Decimales",
+                difficulty: "Fácil",
+                question: "¿A qué número decimal equivale la fracción 1/2?",
+                type: "multiple",
+                options: ["0.25", "0.5", "0.75", "1.2"],
+                answer: "0.5",
+                explanation: "1 dividido entre 2 es exactamente 0.5 (la mitad de la unidad)."
+            },
+            {
+                id: 2,
+                title: "2. Lectura hasta Centésimos",
+                category: "Lectura y Escritura",
+                difficulty: "Fácil",
+                question: "¿Cómo se lee correctamente el número decimal 0.75?",
+                type: "multiple",
+                options: ["Siete décimos", "Setenta y cinco centésimos", "Siete enteros cinco décimos", "Setenta y cinco décimos"],
+                answer: "Setenta y cinco centésimos",
+                explanation: "Tiene dos cifras decimales (décimos y centésimos), por lo que se lee setenta y cinco centésimos."
+            },
+            {
+                id: 3,
+                title: "3. Forma Desarrollada",
+                category: "Forma Desarrollada",
+                difficulty: "Medio",
+                question: "¿Cuál es la forma desarrollada correcta del número 3.45?",
+                type: "multiple",
+                options: ["3 + 0.4 + 0.05", "3 + 4 + 5", "30 + 4.5", "3 + 0.04 + 0.5"],
+                answer: "3 + 0.4 + 0.05",
+                explanation: "3 unidades (3), más 4 décimos (0.4), más 5 centésimos (0.05)."
+            },
+            {
+                id: 4,
+                title: "4. Suma con Decimales",
+                category: "Operaciones",
+                difficulty: "Fácil",
+                question: "Resuelve la siguiente operación: 12.5 + 4.25",
+                type: "input",
+                answer: "16.75",
+                explanation: "Alineando el punto: 12.50 + 4.25 = 16.75."
+            },
+            {
+                id: 5,
+                title: "5. Fracción Equivalente",
+                category: "Fracciones y Decimales",
+                difficulty: "Medio",
+                question: "¿Qué fracción es equivalente a 3/4 expresada en centésimos?",
+                type: "multiple",
+                options: ["25/100", "50/100", "75/100", "34/100"],
+                answer: "75/100",
+                explanation: "3/4 amplificado por 25 da 75/100, que en decimal es 0.75."
+            },
+            {
+                id: 6,
+                title: "6. Resta de Naturales y Decimales",
+                category: "Operaciones",
+                difficulty: "Medio",
+                question: "Resuelve: 20 - 7.35",
+                type: "input",
+                answer: "12.65",
+                explanation: "20.00 - 7.35 = 12.65."
+            },
+            {
+                id: 7,
+                title: "7. Escritura a Número",
+                category: "Lectura y Escritura",
+                difficulty: "Fácil",
+                question: "Escribe en formato numérico: 'Ocho enteros y nueve centésimos'",
+                type: "input",
+                answer: "8.09",
+                explanation: "Ocho enteros (8) y nueve centésimos (0.09, recordando que los décimos son 0)."
+            },
+            {
+                id: 8,
+                title: "8. Multiplicación de Decimales",
+                category: "Operaciones",
+                difficulty: "Medio",
+                question: "Resuelve: 4.5 × 2",
+                type: "input",
+                answer: "9",
+                explanation: "4.5 duplicado es igual a 9 o 9.0."
+            },
+            {
+                id: 9,
+                title: "9. Identificar Centésimos",
+                category: "Lectura y Escritura",
+                difficulty: "Fácil",
+                question: "En el número 6.28, ¿qué dígito ocupa el lugar de los centésimos?",
+                type: "multiple",
+                options: ["6", "2", "8", "Ninguno"],
+                answer: "8",
+                explanation: "El 2 está en los décimos y el 8 está en la posición de los centésimos."
+            },
+            {
+                id: 10,
+                title: "10. Forma Desarrollada Inversa",
+                category: "Forma Desarrollada",
+                difficulty: "Medio",
+                question: "¿Qué número representa la expresión: 7 + 0.3 + 0.02?",
+                type: "input",
+                answer: "7.32",
+                explanation: "Juntando unidades (7), décimos (3) y centésimos (2) se forma 7.32."
+            },
+            {
+                id: 11,
+                title: "11. Fracción 1/4 en Decimal",
+                category: "Fracciones y Decimales",
+                difficulty: "Fácil",
+                question: "¿Cuál es el valor decimal de 1/4?",
+                type: "multiple",
+                options: ["0.14", "0.25", "0.40", "0.75"],
+                answer: "0.25",
+                explanation: "Una cuarta parte de la unidad es 0.25."
+            },
+            {
+                id: 12,
+                title: "12. Problema Práctico de Suma",
+                category: "Operaciones",
+                difficulty: "Medio",
+                question: "Compraste pan por $3.50 y leche por $2.25. ¿Cuánto pagas en total?",
+                type: "input",
+                answer: "5.75",
+                explanation: "3.50 + 2.25 = 5.75 dólares."
+            },
+            {
+                id: 13,
+                title: "13. Multiplicación Natural x Decimal",
+                category: "Operaciones",
+                difficulty: "Difícil",
+                question: "Calcula el resultado de: 12 × 1.5",
+                type: "input",
+                answer: "18",
+                explanation: "12 por 1 (12) más la mitad de 12 (6) es igual a 18."
+            },
+            {
+                id: 14,
+                title: "14. Fracción 3/5 a Decimal",
+                category: "Fracciones y Decimales",
+                difficulty: "Difícil",
+                question: "¿A qué decimal equivale 3/5?",
+                type: "multiple",
+                options: ["0.35", "0.6", "0.75", "0.30"],
+                answer: "0.6",
+                explanation: "Amplificando por 2 se obtiene 6/10, que es igual a 0.6."
+            },
+            {
+                id: 15,
+                title: "15. Desafío Maestro de Operaciones",
+                category: "Operaciones",
+                difficulty: "Difícil",
+                question: "Resuelve: (15.5 - 5.5) × 2",
+                type: "input",
+                answer: "20",
+                explanation: "Primero la resta dentro del paréntesis: 15.5 - 5.5 = 10. Luego 10 × 2 = 20."
+            }
+        ];
+
+        const motivationalQuotes = [
+            "¡Excelente trabajo! Vas por buen camino.",
+            "¡Increíble! Tu mente matemática se fortalece.",
+            "¡Sigue así! Cada reto te hace más brillante.",
+            "¡Impresionante precisión numérica!",
+            "¡Dominando las fracciones como un experto!"
+        ];
+
+        const randomAnimationsClasses = ["anim-pulse", "anim-bounce", "hover:scale-105 transition-transform", "animate-fadeIn"];
+
+        // Estado de la app guardado en localStorage
+        let appState = {
+            screen: 'welcome', // 'welcome', 'challenges', 'summary'
+            currentIndex: 0,
+            stats: JSON.parse(localStorage.getItem('frac_stats')) || { streak: 0, correct: 0, errors: 0 },
+            answersLog: JSON.parse(localStorage.getItem('frac_answersLog')) || {},
+            userAnswer: '',
+            feedback: null,
+            quote: '',
+            shake: false
+        };
+
+        function saveAppData() {
+            localStorage.setItem('frac_stats', JSON.stringify(appState.stats));
+            localStorage.setItem('frac_answersLog', JSON.stringify(appState.answersLog));
+        }
+
+        function render() {
+            const container = document.getElementById('app');
+            container.innerHTML = '';
+
+            if (appState.screen === 'welcome') {
+                container.innerHTML = renderWelcomeScreen();
+            } else if (appState.screen === 'challenges') {
+                container.innerHTML = renderChallengesScreen();
+            } else if (appState.screen === 'summary') {
+                container.innerHTML = renderSummaryScreen();
+            }
+        }
+
+        function renderWelcomeScreen() {
+            const hasLog = Object.keys(appState.answersLog).length > 0;
+            return `
+                <div class="flex-grow flex flex-col items-center justify-center p-4 text-center max-w-md mx-auto animate-fadeIn my-auto">
+                    <div class="w-20 h-20 rounded-3xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-3xl mb-6 shadow-2xl shadow-indigo-500/10 anim-bounce">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <span class="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-2">Aventura Matemática Dinámica</span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-4">
+                        Fracciones y Decimales
+                    </h1>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-8">
+                        Tus datos de racha, aciertos y retos completados se guardan automáticamente en tu dispositivo. ¡Prueba los 15 retos!
+                    </p>
+                    <div class="w-full space-y-3">
+                        <button onclick="startApp()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center space-x-2">
+                            <span>Comenzar / Continuar Retos</span>
+                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </button>
+                        ${hasLog ? `
+                            <button onclick="resetProgress()" class="w-full py-2.5 px-4 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800 text-rose-400 text-xs font-medium transition cursor-pointer">
+                                Reiniciar Progreso Guardado
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                <footer class="py-4 text-center text-[11px] text-slate-500 border-t border-slate-800/50">
+                    Fracciones y Decimales &bull; App Dinámica con Persistencia Local
+                </footer>
+            `;
+        }
+
+        function renderChallengesScreen() {
+            const ch = challengesData[appState.currentIndex];
+            const log = appState.answersLog[ch.id];
+            const progressPct = ((appState.currentIndex + 1) / challengesData.length) * 100;
+
+            // Generar botones de retos rápidos
+            let quickButtonsHtml = '';
+            challengesData.forEach((item, idx) => {
+                const isCurrent = appState.currentIndex === idx;
+                const isLogged = appState.answersLog[item.id];
+                let btnStyle = "bg-slate-800/80 text-slate-400 border-slate-700";
+                if (isCurrent) {
+                    btnStyle = "bg-indigo-600 text-white border-indigo-500 scale-105 shadow-md shadow-indigo-600/30";
+                } else if (isLogged) {
+                    btnStyle = isLogged.correct ? "bg-emerald-950/80 text-emerald-300 border-emerald-700/60" : "bg-rose-950/80 text-rose-300 border-rose-700/60";
+                }
+                const randomAnim = randomAnimationsClasses[idx % randomAnimationsClasses.length];
+                quickButtonsHtml += `
+                    <button onclick="jumpToChallenge(${idx})" class="w-9 h-9 rounded-xl border text-xs font-semibold shrink-0 flex items-center justify-center transition-all cursor-pointer ${btnStyle} ${randomAnim}" title="Reto ${item.id}: ${item.title}">
+                        ${item.id}
+                    </button>
+                `;
+            });
+
+            // Generar opciones o input
+            let optionsHtml = '';
+            if (ch.type === 'multiple') {
+                optionsHtml = '<div class="grid grid-cols-1 gap-2.5 mb-4">';
+                ch.options.forEach((opt, idx) => {
+                    let optStyle = "bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60";
+                    if (appState.feedback !== null || log) {
+                        const loggedAns = log?.userAns;
+                        if (opt === ch.answer) {
+                            optStyle = "bg-emerald-950/80 border-emerald-500 text-emerald-200";
+                        } else if (opt === loggedAns || (appState.feedback && appState.feedback.status === 'error' && opt === appState.userAnswer)) {
+                            optStyle = "bg-rose-950/80 border-rose-500 text-rose-200";
+                        }
+                    }
+                    optionsHtml += `
+                        <button ${appState.feedback !== null || log ? 'disabled' : ''} onclick="handleAnswerSubmit('${opt}')" class="w-full text-left px-4 py-3 rounded-xl border text-sm font-light transition-all cursor-pointer flex items-center justify-between ${optStyle}">
+                            <span>${opt}</span>
+                            <div class="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center text-xs text-slate-500">
+                                ${String.fromCharCode(65 + idx)}
+                            </div>
+                        </button>
+                    `;
+                });
+                optionsHtml += '</div>';
+            } else {
+                const val = appState.userAnswer || (log?.userAns || '');
+                const isDisabled = appState.feedback !== null || log;
+                optionsHtml = `
+                    <div class="mb-4">
+                        <div class="flex space-x-2">
+                            <input type="text" ${isDisabled ? 'disabled' : ''} id="text-answer-input" value="${val}" oninput="appState.userAnswer = this.value" onkeydown="if(event.key==='Enter') submitInputAnswer()" placeholder="Escribe tu respuesta numéricamente..." class="flex-grow bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" />
+                            ${!isDisabled ? `
+                                <button onclick="submitInputAnswer()" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition cursor-pointer">Enviar</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Retroalimentación
+            let feedbackHtml = '';
+            const currentFeedback = appState.feedback || (log ? { status: log.correct ? 'success' : 'error', message: log.correct ? '¡Registrado correctamente! ' + ch.explanation : `Respuesta anterior incorrecta. La respuesta era: ${ch.answer}. ${ch.explanation}` } : null);
+
+            if (currentFeedback) {
+                const isSuccess = currentFeedback.status === 'success';
+                feedbackHtml = `
+                    <div class="mt-4 p-4 rounded-2xl border text-xs leading-relaxed animate-fadeIn ${isSuccess ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200' : 'bg-rose-950/40 border-rose-500/40 text-rose-200'}">
+                        <div class="flex items-center space-x-2 font-semibold mb-1">
+                            <i class="fa-solid ${isSuccess ? 'fa-circle-check text-emerald-400' : 'fa-circle-xmark text-rose-400'}"></i>
+                            <span>${isSuccess ? '¡Correcto!' : '¡Incorrecto!'}</span>
+                        </div>
+                        <p>${currentFeedback.message}</p>
+                        ${appState.quote && isSuccess ? `<p class="mt-2 text-[11px] text-indigo-300 italic">💡 ${appState.quote}</p>` : ''}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="flex-grow flex flex-col justify-between w-full py-2">
+                    <div>
+                        <!-- Header de Racha y Estadísticas -->
+                        <header class="flex items-center justify-between bg-slate-900/60 backdrop-blur-md border border-slate-800 px-4 py-3 rounded-2xl mb-4 shadow-sm">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="appState.screen='welcome'; render();" class="text-slate-400 hover:text-white transition cursor-pointer" title="Ir a portada">
+                                    <i class="fa-solid fa-house text-sm"></i>
+                                </button>
+                                <div class="flex items-center space-x-1.5 text-amber-400 text-xs font-medium" title="Racha actual">
+                                    <i class="fa-solid fa-fire animate-pulse"></i>
+                                    <span>${appState.stats.streak} racha</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 text-xs font-medium">
+                                <span class="text-emerald-400 flex items-center space-x-1" title="Aciertos">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>${appState.stats.correct}</span>
+                                </span>
+                                <span class="text-rose-400 flex items-center space-x-1" title="Errores">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                    <span>${appState.stats.errors}</span>
+                                </span>
+                            </div>
+                        </header>
+
+                        <!-- Botones de retos rápidos -->
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Selecciona un reto:</div>
+                                <button onclick="resetProgress()" class="text-[10px] text-rose-400 hover:underline cursor-pointer">Borrar progreso</button>
+                            </div>
+                            <div class="flex space-x-1.5 overflow-x-auto pb-2 scrollbar-thin">
+                                ${quickButtonsHtml}
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta del Reto -->
+                        <main class="bg-slate-900/80 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 shadow-2xl mb-4 ${appState.shake ? 'animate-bounce border-rose-500/50' : ''}">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[10px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-800/50">
+                                    ${ch.category}
+                                </span>
+                                <span class="text-xs text-slate-400">
+                                    Reto ${appState.currentIndex + 1} de ${challengesData.length}
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 mb-6 overflow-hidden">
+                                <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${progressPct}%"></div>
+                            </div>
+                            <h2 class="text-lg font-semibold text-white mb-2">${ch.title}</h2>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                                ${ch.question}
+                            </p>
+                            ${optionsHtml}
+                            ${feedbackHtml}
+                        </main>
+                    </div>
+
+                    <!-- Botón Siguiente -->
+                    <button onclick="nextChallenge()" class="w-full py-3.5 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-600/20 cursor-pointer flex items-center justify-center space-x-2">
+                        <span>${appState.currentIndex < challengesData.length - 1 ? 'Siguiente Reto' : 'Ver Resultados Finales'}</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderSummaryScreen() {
+            return `
+                <div class="flex-grow flex flex-col items-center justify-center p-4 text-center max-w-md mx-auto animate-fadeIn my-auto">
+                    <div class="relative mb-6">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full blur-md opacity-50 animate-pulse"></div>
+                        <div class="relative w-24 h-24 rounded-3xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-4xl shadow-2xl anim-bounce">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                    </div>
+                    <span class="text-xs font-medium uppercase tracking-widest text-amber-400 mb-2">🎉 ¡Gran Campeón Matemático! 🎉</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+                        ¡Has completado todos los retos!
+                    </h2>
+                    <p class="text-slate-300 text-sm mb-6">
+                        Tu puntuación y respuestas se han guardado con éxito. ¡Sigue mejorando tus marcas cuando desees!
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 w-full mb-8">
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl text-center">
+                            <span class="block text-2xl font-bold text-emerald-400">${appState.stats.correct}</span>
+                            <span class="text-xs text-slate-400 uppercase">Aciertos</span>
+                        </div>
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl text-center">
+                            <span class="block text-2xl font-bold text-rose-400">${appState.stats.errors}</span>
+                            <span class="text-xs text-slate-400 uppercase">Errores</span>
+                        </div>
+                    </div>
+                    <div class="w-full space-y-3">
+                        <button onclick="appState.currentIndex=0; appState.screen='challenges'; render();" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium text-sm shadow-lg shadow-indigo-600/30 transition cursor-pointer flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>Repasar Retos</span>
+                        </button>
+                        <button onclick="resetProgress()" class="w-full py-3 px-6 rounded-2xl bg-slate-900 border border-slate-800 text-rose-400 hover:bg-slate-800 text-xs font-medium transition cursor-pointer">
+                            Reiniciar Todo el Progreso Guardado
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startApp() {
+            appState.screen = 'challenges';
+            render();
+        }
+
+        function jumpToChallenge(idx) {
+            appState.currentIndex = idx;
+            appState.userAnswer = '';
+            const ch = challengesData[idx];
+            if (appState.answersLog[ch.id]) {
+                const log = appState.answersLog[ch.id];
+                appState.feedback = {
+                    status: log.correct ? 'success' : 'error',
+                    message: log.correct ? '¡Ya habías respondido correctamente! ' + ch.explanation : `Respondiste anteriormente incorrecto. La respuesta era: ${ch.answer}. ${ch.explanation}`
+                };
+            } else {
+                appState.feedback = null;
+            }
+            render();
+        }
+
+        function handleAnswerSubmit(selectedOption) {
+            const ch = challengesData[appState.currentIndex];
+            if (appState.feedback !== null || appState.answersLog[ch.id]) return;
+
+            const isCorrect = selectedOption.toLowerCase() === ch.answer.toLowerCase();
+            appState.answersLog[ch.id] = { userAns: selectedOption, correct: isCorrect };
+
+            if (isCorrect) {
+                appState.quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+                appState.feedback = { status: 'success', message: '¡Correcto! ' + ch.explanation };
+                appState.stats.streak += 1;
+                appState.stats.correct += 1;
+            } else {
+                appState.shake = true;
+                setTimeout(() => { appState.shake = false; render(); }, 500);
+                appState.feedback = { status: 'error', message: `Incorrecto. La respuesta correcta era: ${ch.answer}. ${ch.explanation}` };
+                appState.stats.streak = 0;
+                appState.stats.errors += 1;
+            }
+
+            saveAppData();
+            render();
+        }
+
+        function submitInputAnswer() {
+            const inputEl = document.getElementById('text-answer-input');
+            if (!inputEl) return;
+            const val = inputEl.value.trim();
+            if (!val) return;
+            appState.userAnswer = val;
+            handleAnswerSubmit(val);
+        }
+
+        function nextChallenge() {
+            appState.userAnswer = '';
+            appState.feedback = null;
+            if (appState.currentIndex < challengesData.length - 1) {
+                appState.currentIndex += 1;
+                render();
+            } else {
+                appState.screen = 'summary';
+                render();
+            }
+        }
+
+        function resetProgress() {
+            if (window.confirm("¿Deseas reiniciar todo tu progreso, racha y estadísticas?")) {
+                appState.stats = { streak: 0, correct: 0, errors: 0 };
+                appState.answersLog = {};
+                appState.currentIndex = 0;
+                appState.userAnswer = '';
+                appState.feedback = null;
+                appState.screen = 'welcome';
+                localStorage.removeItem('frac_stats');
+                localStorage.removeItem('frac_answersLog');
+                render();
+            }
+        }
+
+        // Carga inicial
+        window.onload = function () {
+            render();
+        };
+    </script>
+</body>
+
+</html>
